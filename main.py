@@ -60,7 +60,7 @@ async def start(ctx):
     await ctx.send("Merhaba, ben bir Pokémon oyun botuyum! Kendi pokemonunuzu oluşturmak için !go yazın")
 
 @bot.command()
-async def info(ctx)
+async def info(ctx):
     if ctx.author.name in Pokemon.pokemons:
         pokemon = Pokemon.pokemons[ctx.author.name]
         await ctx.send(pokemon.info)
