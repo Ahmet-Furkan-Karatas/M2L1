@@ -61,10 +61,12 @@ async def start(ctx):
 
 @bot.command()
 async def info(ctx):
+    # Kullanıcının Pokémon'u olup olmadığını kontrol edin
     if ctx.author.name in Pokemon.pokemons:
-        pokemon = Pokemon.pokemons[ctx.author.name]
-        await ctx.send(pokemon.info)
+        pokemon = Pokemon.pokemons[ctx.author.name]  # Pokémon'u al
+        pokemon_info = await pokemon.info()  # Pokémon bilgilerini al
+        await ctx.send(pokemon_info)  # Bilgileri gönder
     else:
-        await ctx.send("Henüz bir pokemon oluşturmadınız! Lütfen !go komutunu kullanın.")
+        # Kullanıcının henüz Pokémon oluşturmadığını belirt
+        await ctx.send("Henüz bir Pokémon oluşturmadınız! Lütfen `!go` komutunu kullanarak bir Pokémon oluşturun.")
 
-bot.run(token)
