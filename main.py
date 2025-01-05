@@ -28,6 +28,10 @@ async def go(ctx):
             pokemon = Wizard(author)  # Wizard türünde bir Pokémon oluştururuz
         elif chance == 3:
             pokemon = Fighter(author)  # Fighter türünde bir Pokémon oluştururuz
+        
+        # Pokémon'u Pokemon.pokemons sözlüğüne kaydediyoruz
+        Pokemon.pokemons[author] = pokemon
+        
         await ctx.send(await pokemon.info())  # Pokémon hakkında bilgi göndeririz
         image_url = await pokemon.show_img()  # Pokémon görüntüsünün URL'sini alırız
         if image_url:

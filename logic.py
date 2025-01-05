@@ -9,57 +9,66 @@ class Pokemon:
         self.pokemon_number = random.randint(1, 1000)
         self.img = None
         self.name = None
-        self.hp = random.randint(1,100)
-        self.power = random.randint(1,100)
-        self.attack = "Atak"
-    
-    async def attack(self, enemy):
-        if isinstance(enemy, Wizard):  # Enemy'nin bir Wizard veri tipi olduğunu (Büyücü sınıfının bir örneği olduğunu) kontrol etme
-            şans = random.randint(1, 5) 
-            if şans == 1:
-                return "Sihirbaz Pokémon, savaşta bir kalkan kullanıldı!"
-            if enemy.hp > self.power:
-                enemy.hp -= self.power
-                return f"Pokémon eğitmeni @{self.pokemon_trainer} @{enemy.pokemon_trainer}'ne saldırdı\n@{enemy.pokemon_trainer}'nin sağlık durumu{enemy.hp}"
-            else:
-                enemy.hp = 0
-                return f"Pokémon eğitmeni @{self.pokemon_trainer} @{enemy.pokemon_trainer}'ni yendi!"
+        self.hp = random.randint(50, 150)
+        self.power = random.randint(20, 100)
+        self.weight = None  # Kilo bilgisi için alan
+        self.height = None  # Boy bilgisi için alan
 
-    async def get_name(self):
+    async def get_pokemon_data(self):
         url = f'https://pokeapi.co/api/v2/pokemon/{self.pokemon_number}'
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as response:
                 if response.status == 200:
                     data = await response.json()
-                    return data['forms'][0]['name']
+                    self.name = data['forms'][0]['name']
+                    self.weight = data['weight']
+                    self.height = data['height']
+                    self.img = data['sprites']['front_default']
                 else:
-                    return "Pikachu"
+                    self.name = "Pikachu"
+                    self.weight = "Bilinmiyor"
+                    self.height = "Bilinmiyor"
 
     async def info(self):
-        if not self.name:
-            self.name = await self.get_name()
-        return f"Pokémonunuzun ismi: {self.name} \n Pokemonunuzun sağlığı: {self.hp} \n Pokemonunuzun gücü: {self.power}"   
+        if not self.name or self.weight is None or self.height is None:
+            await self.get_pokemon_data()
+        return (
+            f"Pokémon Adı: {self.name.capitalize()}\n"
+            f"Sağlık: {self.hp}\n"
+            f"Güç: {self.power}\n"
+            f"Kilo: {self.weight / 10} kg\n"
+            f"Boy: {self.height / 10} m\n"
+            f"Eğitici: {self.pokemon_trainer}"
+        )
 
     async def show_img(self):
-        # PokeAPI aracılığıyla bir Pokémon'un adını almak için eşzamansız bir yöntem
-        url = f'https://pokeapi.co/api/v2/pokemon/{self.pokemon_number}'
-        async with aiohttp.ClientSession() as session:  # Bir HTTP oturumu açmak
-            async with session.get(url) as response:  # Pokémon verilerini almak için bir GET isteği gönderme
-                if response.status == 200:
-                    data = await response.json()  # JSON yanıtının alınması
-                    img_url = data['sprites']['front_default']  # Bir Pokémonun URL'sini alma
-                    return img_url  # Resmin URL'sini döndürme
-                else:
-                    return None  # İstek başarısız olursa None döndürür
+        if not self.img:
+            await self.get_pokemon_data()
+        return self.img
 
-class Wizard (Pokemon):    
+    async def attack(self, enemy):
+        if isinstance(enemy, Wizard):  # Eğer düşman bir Wizard ise
+            şans = random.randint(1, 5)
+            if şans == 1:
+                return "Sihirbaz Pokémon, savaşta bir kalkan kullanıldı!"
+        if enemy.hp > self.power:
+            enemy.hp -= self.power
+            return (
+                f"Pokémon eğitmeni @{self.pokemon_trainer}, @{enemy.pokemon_trainer}'ne saldırdı.\n"
+                f"@{enemy.pokemon_trainer}'nin sağlık durumu: {enemy.hp}"
+            )
+        else:
+            enemy.hp = 0
+            return f"Pokémon eğitmeni @{self.pokemon_trainer}, @{enemy.pokemon_trainer}'ni yendi!"
+
+class Wizard(Pokemon):
     async def attack(self, enemy):
         return await super().attack(enemy)
 
-class Fighter (Pokemon):                        
+class Fighter(Pokemon):
     async def attack(self, enemy):
-        süper_güç = random.randint(5, 15)  
-        self.güç += süper_güç
-        sonuç = await super().attack(enemy)  
-        self.güç -= süper_güç
+        süper_güç = random.randint(5, 15)
+        self.power += süper_güç
+        sonuç = await super().attack(enemy)
+        self.power -= süper_güç
         return sonuç + f"\nDövüşçü Pokémon süper saldırı kullandı. Eklenen güç: {süper_güç}"
