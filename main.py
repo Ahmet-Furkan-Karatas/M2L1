@@ -70,3 +70,4 @@ async def info(ctx):
         # Kullanıcının henüz Pokémon oluşturmadığını belirt
         await ctx.send("Henüz bir Pokémon oluşturmadınız! Lütfen `!go` komutunu kullanarak bir Pokémon oluşturun.")
 
+bot.run(token)
