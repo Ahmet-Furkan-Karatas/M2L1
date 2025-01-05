@@ -54,9 +54,17 @@ async def attack(ctx):
     else:
         await ctx.send("Saldırmak istediğiniz kullanıcıyı etiketleyerek belirtin.")  # Saldırmak için kullanıcıyı etiketleyerek belirtmesini isteriz
 
-        
+
 @bot.command()
 async def start(ctx):
     await ctx.send("Merhaba, ben bir Pokémon oyun botuyum! Kendi pokemonunuzu oluşturmak için !go yazın")
+
+@bot.command()
+async def info(ctx)
+    if ctx.author.name in Pokemon.pokemons:
+        pokemon = Pokemon.pokemons[ctx.author.name]
+        await ctx.send(pokemon.info)
+    else:
+        await ctx.send("Henüz bir pokemon oluşturmadınız! Lütfen !go komutunu kullanın.")
 
 bot.run(token)
